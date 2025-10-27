@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 process.env.PORT = process.env.PORT || '3405';
-await import('../src/index.js');
+const { server } = await import('../src/index.js');
 const base = `http://localhost:${process.env.PORT}`;
 
 test('payment-service health returns ok', async () => {
@@ -23,4 +23,9 @@ test('pay returns 201 on valid input', async () => {
   const data = await resp.json();
   assert.equal(data.status, 'approved');
   assert.ok(data.transactionId);
+});
+
+// Cleanup server after all tests complete
+test.after(() => {
+  server.close();
 });

@@ -61,8 +61,8 @@ test('create order and pay successfully via stubs', async () => {
   assert.equal(paid.payment.status, 'approved');
 });
 
-// Cleanup servers when process exits
-process.on('exit', () => {
-  try { inventoryServer.close(); } catch {}
-  try { paymentServer.close(); } catch {}
+// Cleanup servers after all tests complete
+test.after(() => {
+  inventoryServer.close();
+  paymentServer.close();
 });

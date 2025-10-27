@@ -20,6 +20,8 @@ app.post('/pay', (req, res) => {
   res.status(201).json({ transactionId: txId, orderId, amount, method, status: 'approved' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`payment-service listening on :${PORT}`);
 });
+
+export { server };
