@@ -49,6 +49,9 @@ jobs:
       - name: Download modules
         working-directory: ${{ matrix.service }}
         run: go mod download
+      - name: Tidy modules
+        working-directory: ${{ matrix.service }}
+        run: go mod tidy
       - name: Run go tests
         working-directory: ${{ matrix.service }}
         run: go test ./...
