@@ -1,10 +1,12 @@
 FROM golang:1.22-alpine AS build
 WORKDIR /src
 ENV GOPROXY=https://proxy.golang.org,direct
+# Copy mod file for caching layer
 COPY go.mod ./
-RUN go mod download && go mod tidy
+RUN go mod download || true
+# Copy source, then tidy and build
 COPY . .
-RUN go build -o /bin/catalog
+RUN go mod tidy && go build -o /bin/catalog
 
 FROM alpine:3.20
 WORKDIR /app
