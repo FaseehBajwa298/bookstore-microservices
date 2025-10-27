@@ -80,6 +80,8 @@ app.post('/orders/:id/pay', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`order-service listening on :${PORT}`);
 });
+
+export { server };

@@ -27,8 +27,8 @@ paymentApp.post('/pay', (req, res) => {
 });
 const paymentServer = paymentApp.listen(3305);
 
-// Start order-service (module starts listening on import)
-await import('../src/index.js');
+// Start order-service and get server reference
+const { server } = await import('../src/index.js');
 
 const base = `http://localhost:${process.env.PORT}`;
 
@@ -65,4 +65,5 @@ test('create order and pay successfully via stubs', async () => {
 test.after(() => {
   inventoryServer.close();
   paymentServer.close();
+  server.close();
 });
