@@ -1,0 +1,81 @@
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./user-service/db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  user-service:
+    build: ./user-service
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      PORT: ${USER_SERVICE_PORT}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "${USER_SERVICE_PORT}:3001"
+
+  catalog-service:
+    build: ./catalog-service
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      PORT: ${CATALOG_SERVICE_PORT}
+      MONGO_URI: "mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/?authSource=admin"
+      MONGO_DB: "catalogdb"
+    ports:
+      - "${CATALOG_SERVICE_PORT}:3002"
+
+  order-service:
+    build: ./order-service
+    environment:
+      PORT: ${ORDER_SERVICE_PORT}
+    ports:
+      - "${ORDER_SERVICE_PORT}:3003"
+
+  inventory-service:
+    build: ./inventory-service
+    environment:
+      PORT: ${INVENTORY_SERVICE_PORT}
+    ports:
+      - "${INVENTORY_SERVICE_PORT}:3004"
+
+  payment-service:
+    build: ./payment-service
+    environment:
+      PORT: ${PAYMENT_SERVICE_PORT}
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:3005"

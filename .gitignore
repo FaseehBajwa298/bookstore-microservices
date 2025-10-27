@@ -1,0 +1,32 @@
+# Root ignores for monorepo
+
+# Env files
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Node.js
+**/node_modules/
+**/coverage/
+**/dist/
+**/.npmrc
+**/package-lock.json
+
+# Go
+**/bin/
+**/*.exe
+**/*.out
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+**/.dockerignore
+
+# Editor
+.vscode/
+.idea/
